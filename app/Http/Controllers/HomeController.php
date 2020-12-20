@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Appointment;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -23,6 +24,9 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('home');
+        return view('welcome', [
+            'appointments' => Appointment::with('hospital','user')->paginate()
+            // 'appointments' => Appointment::where('user_id', \Auth::user()->id)->with('hospital')->get()
+        ]);
     }
 }

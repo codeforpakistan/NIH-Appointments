@@ -11,10 +11,12 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+use App\Http\Controllers\HomeController;
+
+Route::get('/', 'HomeController@index')->name('home');
+Route::get('settings', 'HomeController@settings')->name('settings');
 
 Auth::routes();
 
-Route::get('/home', 'HomeController@index')->name('home');
+Route::resource('user', 'UserController');
+Route::resource('appointments', 'AppointmentController');

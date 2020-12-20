@@ -1,38 +1,32 @@
 @extends('layouts/page')
 
 @section('content')
+@component('partials/table', ['model' => 'appointment', 'items' => $appointments, 'controls' => true])
+<div class="card-body table-responsive p-0">
+  <table class="table table-hover table-striped text-nowrap mb-0">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th width="99%">Hospital</th>
+        <th>Time</th>
+        <th>Created</th>
+        <th>Updated</th>
+      </tr>
+    </thead>
+    <tbody>
+      @foreach ($appointments as $appointment)
+      <tr>
+        <td>{{ $appointment->id }}</td>
+        <td><a href="{{ route('appointments.edit', $appointment->id) }}">{{ $appointment->hospital->name }}</td>
+        <td>{{ \Carbon\Carbon::parse($appointment->start)->diffForHumans() }}</td>
+        <td>{{ \Carbon\Carbon::parse($appointment->created_at)->diffForHumans() }}</td>
+        <td>{{ \Carbon\Carbon::parse($appointment->updated_at)->diffForHumans() }}</td>
+      </tr>
+      @endforeach
+    </tbody>
+  </table>
+</div>
+@endcomponent
 
-  <div class="flex-center position-ref full-height">
-    @if (Route::has('login'))
-    <div class="top-right links">
-      @auth
-      <a href="{{ url('/home') }}">Home</a>
-      @else
-      <a href="{{ route('login') }}">Login</a>
-
-      @if (Route::has('register'))
-      <a href="{{ route('register') }}">Register</a>
-      @endif
-      @endauth
-    </div>
-    @endif
-
-    <div class="content">
-      <div class="title m-b-md">
-        Laravel
-      </div>
-
-      <div class="links">
-        <a href="https://laravel.com/docs">Docs</a>
-        <a href="https://laracasts.com">Laracasts</a>
-        <a href="https://laravel-news.com">News</a>
-        <a href="https://blog.laravel.com">Blog</a>
-        <a href="https://nova.laravel.com">Nova</a>
-        <a href="https://forge.laravel.com">Forge</a>
-        <a href="https://vapor.laravel.com">Vapor</a>
-        <a href="https://github.com/laravel/laravel">GitHub</a>
-      </div>
-    </div>
-  </div>
 
 @endsection
