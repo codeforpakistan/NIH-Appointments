@@ -25,7 +25,7 @@ class HomeController extends Controller
     public function index()
     {
         return view('welcome', [
-            'appointments' => Appointment::with('hospital','user')->paginate()
+            'appointments' => Appointment::with('hospital','user')->latest()->paginate()
             // 'appointments' => Appointment::where('user_id', \Auth::user()->id)->with('hospital')->get()
         ]);
     }

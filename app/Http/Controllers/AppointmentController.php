@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\User;
 use App\Appointment;
 use App\Hospital;
 use Illuminate\Http\Request;
@@ -17,8 +18,11 @@ class AppointmentController extends Controller
      */
     public function index()
     {
-        return view('index', [
-            'items' => Appointment::all()
+        $user = \Auth::user();
+        $appointments = $user->hasRole(['admin', 'staff', 'agent']) ? Appointment::with('hospital', 'user') : Appointment::where('user_id', \Auth::user()->id)->with('hospital');
+        return view('appointments.index', [
+            'appointments' => $appointments->latest()->paginate(),
+            'hospitals' => Hospital::all()->pluck('name')
         ]);
     }
 
@@ -29,8 +33,10 @@ class AppointmentController extends Controller
      */
     public function create()
     {
-        return view('form', [
-            'hospitals' => Hospital::all()
+        return view('appointments.form', [
+            'users' => User::role(['caller'])->get(),
+            'hospitals' => Hospital::all(),
+            'slots' => $this->generateDateRange()
         ]);
     }
 
@@ -43,23 +49,30 @@ class AppointmentController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'hospital'  => 'required|string',
-            'start' => 'required|date:c',
+            'caller'    => 'sometimes|exists:App\User,id',
+            'hospital'  => 'required|string|exists:App\Hospital,id',
+            'start'     => 'required|date',
+            'slot'      => 'required',
         ]);
-        
+
         $appointment = new Appointment;
         $appointment->slug = Str::uuid();
-        $appointment->user_id = $request->user()->id;
+        if ($request->user()->hasRole('admin')) {
+            $appointment->user_id = $request->filled('caller') ? $request->caller : $request->user()->id;
+        } else {
+            $appointment->user_id = $request->user()->id;
+        }
         $appointment->hospital_id = $request->hospital;
-        $appointment->start = $request->start;
-        
-        $start = \Carbon\Carbon::parse($request->start);
-        $finish = $start->addMinutes(15);
 
+        $start = \Carbon\Carbon::parse($request->start . ' ' . $request->slot, config('app.timezone'));
+        $finish = \Carbon\Carbon::parse($request->start . ' ' . $request->slot, config('app.timezone'));
+        $finish->addMinutes(15);
+
+        $appointment->start = $start;
         $appointment->finish = $finish;
         $appointment->save();
 
-        return redirect()->route('home');
+        return redirect()->route('home')->with('success', 'Appointment booked');
     }
 
     /**
@@ -81,7 +94,12 @@ class AppointmentController extends Controller
      */
     public function edit(Appointment $appointment)
     {
-        //
+        return view('appointments.form', [
+            'appointment' => $appointment,
+            'users' => User::role(['caller'])->get(),
+            'hospitals' => Hospital::all(),
+            'slots' => $this->generateDateRange()
+        ]);
     }
 
     /**
@@ -93,7 +111,30 @@ class AppointmentController extends Controller
      */
     public function update(Request $request, Appointment $appointment)
     {
-        //
+        // return $request;
+        $request->validate([
+            'caller'    => 'sometimes|exists:App\User,id',
+            'hospital'  => 'required|string|exists:App\Hospital,id',
+            'start'     => 'required|date',
+            'slot'      => 'required',
+        ]);
+
+        $start = \Carbon\Carbon::parse($request->start . ' ' . $request->slot, config('app.timezone'));
+        $finish = \Carbon\Carbon::parse($request->start . ' ' . $request->slot, config('app.timezone'));
+        $finish->addMinutes(15);
+
+        if ($request->user()->hasRole('admin')) {
+            $appointment->user_id = $request->filled('caller') ? $request->caller : $request->user()->id;
+        }
+        $appointment->hospital_id = $request->hospital;
+        $appointment->start = $start;
+        $appointment->finish = $finish;
+        $appointment->save();
+
+        if ($appointment->wasChanged()) 
+            $request->session()->flash('success', 'Appointment updated');
+
+        return redirect()->route('home');
     }
 
     /**
@@ -104,6 +145,19 @@ class AppointmentController extends Controller
      */
     public function destroy(Appointment $appointment)
     {
-        //
+        $appointment->delete();
+
+        return redirect()->route('home')->with('success', 'Appoinment cancelled');
+    }
+
+    private function generateDateRange($interval = 15)
+    {
+        $dates = [];
+        $start = \Carbon\Carbon::parse(now())->startOfDay();
+        $finish = \Carbon\Carbon::parse(now())->endOfDay();
+        for ($i = $start; $i <= $finish; $i->addMinutes($interval)) {
+            array_push($dates, $i->format('g:ia'));
+        }
+        return $dates;
     }
 }

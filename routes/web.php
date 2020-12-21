@@ -11,12 +11,12 @@
 |
 */
 
-use App\Http\Controllers\HomeController;
-
-Route::get('/', 'HomeController@index')->name('home');
-Route::get('settings', 'HomeController@settings')->name('settings');
 
 Auth::routes();
 
-Route::resource('user', 'UserController');
-Route::resource('appointments', 'AppointmentController');
+Route::middleware('auth')->group(function () {
+    Route::get('/', 'AppointmentController@index')->name('home');
+    Route::resource('users', 'UserController');
+    Route::resource('appointments', 'AppointmentController');
+    Route::resource('hospitals', 'HospitalController');
+});

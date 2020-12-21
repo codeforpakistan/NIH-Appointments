@@ -1,0 +1,1 @@
+<a class="btn btn-primary mx-1 text-nowrap" href="{{ route(Str::plural($model).'.create') }}">New</a>

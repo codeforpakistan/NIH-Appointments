@@ -1,23 +1,33 @@
 <template>
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="card">
-                    <div class="card-header">Example Component</div>
-
-                    <div class="card-body">
-                        I'm an example component.
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+  <div class="card">
+    <button type="button" @click="getLocation" class="btn btn-secondary" id="demo">Fetch Location</button>
+    <div class="card-body" id="coordinates">{{ latitude }}, {{ longitude }}</div>
+  </div>
 </template>
 
 <script>
-    export default {
-        mounted() {
-            console.log('Component mounted.')
-        }
+export default {
+  data () {
+    return {
+      latitude: null,
+      longitude: null
     }
+  },
+  mounted() {
+    console.log("Component mounted.");
+  },
+  methods: {
+    getLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(this.onSuccess);
+      } else {
+        alert("Geolocation is not supported by this browser.");
+      }
+    },
+    onSuccess(position) {
+      this.latitude = position.coords.latitude;
+      this.longitude = position.coords.longitude;
+    }
+  }
+};
 </script>

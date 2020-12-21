@@ -14,7 +14,9 @@ class HospitalController extends Controller
      */
     public function index()
     {
-        //
+        return view('hospitals.index', [
+            'hospitals' => Hospital::withCount('appointments')->latest()->paginate(env('PER_PAGE', 10))
+        ]);
     }
 
     /**
@@ -24,7 +26,7 @@ class HospitalController extends Controller
      */
     public function create()
     {
-        //
+        return view('hospitals.form');
     }
 
     /**
@@ -35,7 +37,17 @@ class HospitalController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required|string',
+            'latitude' => 'sometimes|string',
+            'longitude' => 'sometimes|string'
+        ]);
+
+        $hospital = new Hospital();
+        $hospital->name = $request->name;
+        $hospital->save();
+
+        return redirect()->route('hospitals.index')->with('success', 'Hospital created');
     }
 
     /**
@@ -57,7 +69,9 @@ class HospitalController extends Controller
      */
     public function edit(Hospital $hospital)
     {
-        //
+        return view('hospitals.form', [
+            'hospital' => $hospital
+        ]);
     }
 
     /**
@@ -69,7 +83,16 @@ class HospitalController extends Controller
      */
     public function update(Request $request, Hospital $hospital)
     {
-        //
+        $request->validate([
+            'name' => 'required|string'
+        ]);
+
+        $hospital->name = $request->name;
+        $hospital->save();
+
+        if ($hospital->wasChanged())
+            $request->session()->flash('success', 'Hospital updated');
+        return redirect()->route('hospitals.index');
     }
 
     /**

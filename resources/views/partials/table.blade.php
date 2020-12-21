@@ -1,9 +1,21 @@
 <div class="card bg-light">
   <div class="card-header border-0 d-flex">
     <h2 class="mb-0 font-weight-normal flex-grow-1">{{ ucwords(Str::plural($model)) }}</h2>
+    
     @if (isset($controls) && $controls)
-      <a class="btn btn-primary" href="{{ route(Str::plural($model).'.create') }}">Create {{ ucwords($model) }}</a>
+    <div class="form-inline">
+      @include('components.create', ['mode' => $model])
+      @hasanyrole('admin|staff|agent')
+        @includeWhen($search, 'components.search')
+        @isset($filters)
+          @foreach ($filters as $filter => $list)
+            @include('components.filters', ['filter' => $filter, 'items' => $list])
+          @endforeach
+        @endisset
+      @endhasanyrole
+    </div>
     @endif
+      
   </div>
   @if($items->count())
   {{ $slot }}
