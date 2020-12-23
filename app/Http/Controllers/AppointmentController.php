@@ -50,7 +50,7 @@ class AppointmentController extends Controller
     {
         $request->validate([
             'caller'    => 'sometimes|exists:App\User,id',
-            'hospital'  => 'required|string|exists:App\Hospital,id',
+            'hospital'  => 'required|exists:App\Hospital,id',
             'start'     => 'required|date',
             'slot'      => 'required',
         ]);
@@ -114,7 +114,7 @@ class AppointmentController extends Controller
         // return $request;
         $request->validate([
             'caller'    => 'sometimes|exists:App\User,id',
-            'hospital'  => 'required|string|exists:App\Hospital,id',
+            'hospital'  => 'required|exists:App\Hospital,id',
             'start'     => 'required|date',
             'slot'      => 'required',
         ]);

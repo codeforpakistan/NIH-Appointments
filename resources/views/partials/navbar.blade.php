@@ -17,7 +17,11 @@
       @auth
       <li class="nav-item"><a class="nav-link" href="{{ route('appointments.index') }}">Appointments</a></li>
       @hasanyrole('admin|staff|agent')<li class="nav-item"><a class="nav-link" href="{{ route('users.index') }}">Users</a></li>@endhasanyrole
-      @role('admin')<li class="nav-item"><a class="nav-link" href="{{ route('hospitals.index') }}">Hospitals</a></li>@endrole
+      @role('admin')
+      <li class="nav-item"><a class="nav-link" href="{{ route('hospitals.index') }}">Hospitals</a></li>
+      <li class="nav-item"><a class="nav-link" href="{{ route('departments.index') }}">Departments</a></li>
+      <li class="nav-item"><a class="nav-link" href="{{ route('doctors.index') }}">Doctors</a></li>
+      @endrole
       <li class="nav-item"><a class="nav-link" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
         {{ __('Logout') }}
       </a></li>

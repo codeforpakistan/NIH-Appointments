@@ -5,15 +5,15 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Appointment extends Model
+class Doctor extends Model
 {
     use SoftDeletes;
     /**
      * Get the comments for the blog post.
      */
-    public function user()
+    public function department()
     {
-        return $this->belongsTo('App\User');
+        return $this->belongsTo('App\Department');
     }
 
     /**

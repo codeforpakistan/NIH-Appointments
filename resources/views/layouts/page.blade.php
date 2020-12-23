@@ -10,6 +10,12 @@
   @endcomponent
   @endif
 
+  @if (session('error'))
+  @component('components.alert', ['type' => 'danger'])
+    {!! session('error') !!}
+  @endcomponent
+  @endif
+
   @if ($errors->any())
   @include('components.errors', ['errors' => $errors])
   @endif

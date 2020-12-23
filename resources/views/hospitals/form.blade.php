@@ -25,11 +25,31 @@
         @endif
       </div>
     </div>
+    <div class="form-group row">
+      <label for="departments" class="col-sm-2 col-form-label">Departments</label>
+      <div class="col-sm-10">
+        @foreach ($departments as $department)
+        <div class="form-check form-checkinline">
+          @isset($hospital)
+          <input class="form-check-input" type="checkbox" id="h_{{$department->id}}" name="departments[]" value="{{$department->id}}" @if($hospital->departments->contains('id', $department->id)) checked @endif>
+          @else
+          <input class="form-check-input" type="checkbox" id="h_{{$department->id}}" name="departments[]" value="{{$department->id}}">
+          @endisset
+          <label class="form-check-label" for="h_{{$department->id}}">{{$department->name}}</label>
+        </div>
+        @endforeach
+      </div>
+    </div>
   </div>
   <div class="card-footer border-0">
     <button type="submit" class="btn btn-primary">Save</button>
     <a href="{{ route('hospitals.index') }}" class="btn btn-default">Cancel</a>
   </div>
 </form>
-
+@isset($hospital)
+<form class="card card-body text-danger d-block bg-light" method="post" action="{{route('hospitals.destroy', $hospital->id)}}">
+  @csrf @method('DELETE')
+  <button class="btn btn-danger" type="submit" onclick="return confirm('Are you sure?')">Delete Hospital</button>
+</form>
+@endisset
 @endsection

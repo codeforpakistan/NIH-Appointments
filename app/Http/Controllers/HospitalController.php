@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Hospital;
+use App\Department;
 use Illuminate\Http\Request;
 
 class HospitalController extends Controller
@@ -14,8 +15,9 @@ class HospitalController extends Controller
      */
     public function index()
     {
+        $hospitals = Hospital::withCount('appointments','departments');
         return view('hospitals.index', [
-            'hospitals' => Hospital::withCount('appointments')->latest()->paginate(env('PER_PAGE', 10))
+            'hospitals' => $hospitals->latest()->paginate(env('PER_PAGE', 10))
         ]);
     }
 
@@ -26,7 +28,9 @@ class HospitalController extends Controller
      */
     public function create()
     {
-        return view('hospitals.form');
+        return view('hospitals.form', [
+            'departments' => Department::all()
+        ]);
     }
 
     /**
@@ -39,6 +43,7 @@ class HospitalController extends Controller
     {
         $request->validate([
             'name' => 'required|string',
+            'departments' => 'required|array|exists:App\Department,id',
             'latitude' => 'sometimes|string',
             'longitude' => 'sometimes|string'
         ]);
@@ -70,7 +75,8 @@ class HospitalController extends Controller
     public function edit(Hospital $hospital)
     {
         return view('hospitals.form', [
-            'hospital' => $hospital
+            'hospital' => $hospital,
+            'departments' => Department::all()
         ]);
     }
 
@@ -84,11 +90,16 @@ class HospitalController extends Controller
     public function update(Request $request, Hospital $hospital)
     {
         $request->validate([
-            'name' => 'required|string'
+            'name' => 'required|string',
+            'departments' => 'required|array|exists:App\Department,id',
+            'latitude' => 'sometimes|string',
+            'longitude' => 'sometimes|string'
         ]);
 
         $hospital->name = $request->name;
         $hospital->save();
+
+        $hospital->departments()->sync($request->departments);
 
         if ($hospital->wasChanged())
             $request->session()->flash('success', 'Hospital updated');
@@ -103,6 +114,8 @@ class HospitalController extends Controller
      */
     public function destroy(Hospital $hospital)
     {
-        //
+        $hospital->delete();
+
+        return redirect()->route('hospitals.index')->with('success', 'Hospital deleted');
     }
 }

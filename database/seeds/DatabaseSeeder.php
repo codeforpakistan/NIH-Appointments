@@ -15,7 +15,9 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
             UserSeeder::class,
             HospitalSeeder::class,
-            AppointmentSeeder::class
+            DepartmentSeeder::class,
+            DoctorSeeder::class,
+            AppointmentSeeder::class,
         ]);
     }
 }

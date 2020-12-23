@@ -20,6 +20,7 @@ class CreateAppointmentsTable extends Migration
             $table->unsignedBigInteger('hospital_id');
             $table->dateTime('start');
             $table->dateTime('finish');
+            $table->softDeletes();
             $table->timestamps();
         });
     }

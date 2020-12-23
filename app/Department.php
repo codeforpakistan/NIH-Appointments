@@ -5,22 +5,21 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Appointment extends Model
+class Department extends Model
 {
     use SoftDeletes;
     /**
      * Get the comments for the blog post.
      */
-    public function user()
+    public function hospitals()
     {
-        return $this->belongsTo('App\User');
+        return $this->belongsToMany('App\Hospital');
     }
-
     /**
      * Get the comments for the blog post.
      */
-    public function hospital()
+    public function doctors()
     {
-        return $this->belongsTo('App\Hospital');
+        return $this->hasMany('App\Doctor');
     }
 }

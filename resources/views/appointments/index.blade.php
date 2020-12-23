@@ -27,14 +27,18 @@
         </td>
         @hasanyrole('admin|staff|agent')
         <td>
-          <a class="mr-3" href="{{ route('users.show', $appointment->user_id) }}">{{$appointment->user->name}}</a>
+          <a class="mr-3" href="{{ route('users.show', $appointment->user_id) }}">
+            {!! $appointment->user ? $appointment->user->name : '&ndash;' !!}
+          </a>
         </td>
         @endhasanyrole
         <td>
           @hasanyrole('admin|staff|agent')
-          <a class="mr-3" href="{{ route('hospitals.show', $appointment->hospital_id) }}">{{$appointment->hospital->name}}</a>
+          <a class="mr-3" href="{{ route('hospitals.show', $appointment->hospital_id) }}">
+          {!!$appointment->hospital ? $appointment->hospital->name : '&ndash;'!!}
+          </a>
           @else
-          {{$appointment->hospital->name}}
+          {!!$appointment->hospital ? $appointment->hospital->name : '&ndash;'!!}
           @endhasanyrole
         </td>
         <td class="text-muted">{{ \Carbon\Carbon::parse($appointment->created_at)->diffForHumans() }}</td>
